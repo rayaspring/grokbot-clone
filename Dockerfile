@@ -1,13 +1,15 @@
 FROM node:22-bookworm AS deps
 WORKDIR /app
+ENV NODE_ENV=development
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ pkg-config libsqlite3-dev && rm -rf /var/lib/apt/lists/*
 COPY package*.json ./
 COPY server/package*.json server/
 COPY web/package*.json web/
-RUN npm ci
+RUN npm ci --include=dev
 
 FROM node:22-bookworm AS build
 WORKDIR /app
+ENV NODE_ENV=development
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
